@@ -38,6 +38,7 @@ void EPD_ReadBusy(void);
 void EPD_Init(void);
 void EPD_Clear(void);
 void EPD_Display(const uint8_t *blackimage);
+void EPD_Partial_Display(uint16_t x, uint16_t y,const uint8_t *image,uint16_t PART_COLUMN, uint16_t PART_PAGE);
 void EPD_Sleep(void);
 void EPD_ALL_Init(void);
 #endif

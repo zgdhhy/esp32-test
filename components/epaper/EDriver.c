@@ -136,8 +136,8 @@ void EPD_Init(void)
     EPD_ReadBusy();//waiting for the electronic paper IC to release the idle signal
 
     EPD_SendCommand(0x00);//panel setting
-    EPD_SendData(0x0f);//LUT from OTP，128x296
-    EPD_SendData(0x89);//Temperature sensor, boost and other related timing settings
+    EPD_SendData(0x1f);//LUT from OTP，128x296
+//    EPD_SendData(0x89);//Temperature sensor, boost and other related timing settings
 
     EPD_SendCommand(0x61);//resolution setting
     EPD_SendData(0x80);
@@ -145,7 +145,7 @@ void EPD_Init(void)
     EPD_SendData(0x28);
 
     EPD_SendCommand(0X50);//VCOM AND DATA INTERVAL SETTING
-    EPD_SendData(0x97);//WBmode:VBDF 17|D7 VBDW 97 VBDB 57
+    EPD_SendData(0x17);//WBmode:VBDF 17|D7 VBDW 97 VBDB 57
     //WBRmode:VBDF F7 VBDW 77 VBDB 37  VBDR B7
 }
 /**
@@ -174,6 +174,36 @@ void EPD_Display(const uint8_t *blackimage)
     EPD_SendCommand(0x13);
     EPD_SendDatas(blackimage,Width*Height);
     EPD_SendCommand(0x12);
+    EPD_ReadBusy();
+}
+/**
+ * @brief 写图像 黑色
+ * */
+void EPD_Partial_Display(uint16_t x, uint16_t y,const uint8_t *image,uint16_t PART_COLUMN, uint16_t PART_PAGE)
+{
+    if(NULL == image) return;
+    uint16_t x_start, x_end, y_start1, y_end1, y_start2, y_end2;
+    x_start = x;
+    x_end = x+PART_COLUMN-1;
+    if(x_end > EPD_WIDTH-1) return;
+    y_start1 = y / 256;
+    y_start2 = y % 256;
+    y_end1 = y+PART_PAGE-1;
+    if(y_end1 > EPD_HEIGHT-1) return;
+    y_end2 = y_end1 % 256;
+    y_end1 = y_end1 / 256;
+    EPD_SendCommand(0x91);
+    EPD_SendCommand(0x90);
+    EPD_SendData(x_start);
+    EPD_SendData(x_end);
+    EPD_SendData(y_start1);
+    EPD_SendData(y_start2);
+    EPD_SendData(y_end1);
+    EPD_SendData(y_end2);
+    EPD_SendCommand(0x13);
+    EPD_SendDatas(image,PART_COLUMN*PART_PAGE);
+    EPD_SendCommand(0x12);
+    EPD_SendCommand(0x92);
     EPD_ReadBusy();
 }
 /**
