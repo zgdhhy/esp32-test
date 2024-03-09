@@ -15,62 +15,49 @@ void epd_test()
 {
     EPD_ALL_Init();
     FontFile *fp = malloc(sizeof(FontFile));
-//    bmpImage *bmp = malloc(sizeof(bmpImage));
-    InitFont(fp,"/spiffs/ziku.bin",16,16);
-//    bmp_Init(bmp,"/spiffs/epd/2.bmp");
+    bmpImage *bmp = malloc(sizeof(bmpImage));
+    InitFont(fp, "/spiffs/ziku.bin", 16, 16);
+    bmp_Init(bmp, "/spiffs/epd/1.bmp");
 
-    uint8_t *BlackImage;
-    uint8_t *BlackImage1;
-//    uint16_t Imagesize = ((EPD_WIDTH % 8 == 0) ? (EPD_WIDTH / 8) : (EPD_WIDTH / 8 + 1)) * EPD_HEIGHT;
-    if ((BlackImage = (uint8_t *)malloc(16*16)) == NULL)
+    uint8_t *BlackImage, *RedImage;
+    uint16_t Imagesize = ((EPD_WIDTH % 8 == 0) ? (EPD_WIDTH / 8) : (EPD_WIDTH / 8 + 1)) * EPD_HEIGHT;
+    if ((BlackImage = (uint8_t *)malloc(Imagesize)) == NULL)
     {
         ESP_LOGI(TAG, "Failed to apply for black memory...");
         return;
     }
-    if ((BlackImage1 = (uint8_t *)malloc(16*16)) == NULL)
+    if ((RedImage = (uint8_t *)malloc(Imagesize)) == NULL)
     {
-        ESP_LOGI(TAG, "Failed to apply for black memory...");
+        ESP_LOGI(TAG, "Failed to apply for red memory...");
         return;
     }
-    Paint_NewImage(BlackImage, 16, 16, ROTATE_0, WHITE);
-    Paint_NewImage(BlackImage1, 16, 16, ROTATE_0, WHITE);
+    Paint_NewImage(RedImage, EPD_WIDTH, EPD_HEIGHT, ROTATE_90, WHITE);
+    Paint_SelectImage(RedImage);
+    Paint_Clear(BLACK);
 
+    Paint_NewImage(BlackImage, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, BLACK);
     Paint_SelectImage(BlackImage);
-    Paint_Clear(WHITE);
-    Paint_DrawChar(0,0,fp,"’‘",BLACK,WHITE);
-    EPD_Partial_Display(0,0,BlackImage,16,16);
-    Paint_SelectImage(BlackImage1);
-    Paint_Clear(WHITE);
-    Paint_DrawChar(0,0,fp,"’‘",BLACK,WHITE);
-    EPD_Partial_Display(64,64,BlackImage,16,16);
-    vTaskDelay(300 / portTICK_PERIOD_MS);
-    ESP_LOGI(TAG, "1");
+    Paint_Clear(BLACK);
+    Paint_DrawCircle(198, 64, 50, WHITE, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
 
-    Paint_SelectImage(BlackImage);
-    Paint_Clear(WHITE);
-    Paint_DrawChar(0,0,fp,"π˙",BLACK,WHITE);
-    EPD_Partial_Display(0,0,BlackImage,16,16);
-    Paint_SelectImage(BlackImage1);
-    Paint_Clear(WHITE);
-    Paint_DrawChar(0,0,fp,"π˙",BLACK,WHITE);
-    EPD_Partial_Display(64,64,BlackImage,16,16);
-    vTaskDelay(300 / portTICK_PERIOD_MS);
-    ESP_LOGI(TAG, "2");
+    char *str = "‰Ω†ÊòØÊàëÊÇ£ÂæóÊÇ£Â§±ÁöÑÊ¢¶ ÊàëÊòØ‰Ω†ÂèØÊúâÂèØÊó†ÁöÑ‰∫∫";
+    Paint_DrawString(0, 0, fp, str, WHITE, BLACK);
+    Paint_DrawString(0, 20, fp, str, BLACK, WHITE);
+    EPD_Display(BlackImage, RedImage);
+    vTaskDelay(3000 / portTICK_PERIOD_MS);
 
-    Paint_SelectImage(BlackImage);
-    Paint_Clear(WHITE);
-    Paint_DrawChar(0,0,fp,"∂∞",BLACK,WHITE);
-    EPD_Partial_Display(0,0,BlackImage,16,16);
-    Paint_SelectImage(BlackImage1);
-    Paint_Clear(WHITE);
-    Paint_DrawChar(0,0,fp,"∂∞",BLACK,WHITE);
-    EPD_Partial_Display(64,64,BlackImage,16,16);
-    vTaskDelay(300 / portTICK_PERIOD_MS);
-    ESP_LOGI(TAG, "3");
+    Paint_DrawBMP(bmp, WHITE, false);
+    EPD_Display(BlackImage, RedImage);
+    vTaskDelay(3000 / portTICK_PERIOD_MS);
 
+    Paint_Clear(BLACK);
+    EPD_Display(BlackImage, RedImage);
+    ESP_LOGI(TAG, "Goto Sleep.....");
     EPD_Sleep();
     free(BlackImage);
+    free(RedImage);
     BlackImage = NULL;
+    RedImage = NULL;
     CloseFont(fp);
     return;
 }

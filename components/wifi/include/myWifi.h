@@ -6,8 +6,9 @@
 #include "nvs_flash.h"
 #include "esp_netif.h"
 
-#define ESP_STA_WIFI_SSID    "zzzzdddd"
-#define ESP_STA_WIFI_PASS    "12345678z"
+#define ESP_STA_WIFI_SSID    "lvpizzz"
+// #define ESP_STA_WIFI_SSID    "zzzzdddd"
+#define ESP_STA_WIFI_PASS    "12345678"
 #define WIFI_TAG             "WIFI"
 
 extern bool WifiIsconnect;
